@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cooperación Internacional · Doctorado en Ciencias Sociales UDP</title>
+
+<template id="__bundler_thumbnail" data-bg-color="#F4F4F4">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#F4F4F4"/>
+    <rect x="80" y="80" width="1040" height="640" rx="24" fill="#E4E0D5"/>
+    <g fill="#D36473">
+      <circle cx="380" cy="320" r="22"/>
+      <circle cx="520" cy="280" r="22"/>
+      <circle cx="640" cy="260" r="22"/>
+      <circle cx="760" cy="320" r="22"/>
+      <circle cx="430" cy="500" r="22"/>
+      <circle cx="560" cy="540" r="22"/>
+    </g>
+    <g fill="#1C1C1C">
+      <circle cx="700" cy="520" r="14"/>
+      <circle cx="820" cy="460" r="14"/>
+    </g>
+  </svg>
+</template>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+<meta name="ext-resource-dependency" content="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js" data-resource-id="d3lib" />
+<meta name="ext-resource-dependency" content="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js" data-resource-id="topojsonlib" />
+<meta name="ext-resource-dependency" content="https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json" data-resource-id="worldatlas" />
+
+<style>
+  :root {
+    /* ─── Mandy (Primario · Facultad) ─────────────────── */
+    --mandy-50:  #FBF0F2;
+    --mandy-100: #F4D9DD;
+    --mandy-200: #EBB8C0;
+    --mandy-300: #E29CA6;
+    --mandy-400: #DA808E;
+    --mandy-500: #D36473;     /* base */
+    --mandy-600: #BC4F5D;
+    --mandy-700: #9C3E4B;
+    --mandy-800: #6F2C36;
+    --mandy-900: #461C22;
+    --mandy-950: #2A1014;
+
+    /* ─── Neutros ─────────────────────────────────────── */
+    --woodsmoke-950: #1C1C1C;
+    --pearlbush-200: #E4E0D5;
+    --pearlbush-100: #EFEDE5;
+    --pearlbush-50:  #F7F5EE;
+    --white:         #F4F4F4;
+    --pure-white:    #FFFFFF;
+
+    /* ─── Acento (alerta · pasantías) ─────────────────── */
+    --sunset-500: #FF5B4D;
+    --sunset-600: #ED2615;
+    --sunset-700: #C81C0D;
+
+    /* ─── Tokens semánticos ───────────────────────────── */
+    --bg-page:        var(--white);
+    --bg-surface:     var(--pure-white);
+    --bg-map-land:    var(--pearlbush-200);
+    --bg-map-water:   var(--pearlbush-50);
+    --border-soft:    rgba(28,28,28,0.08);
+    --border-medium:  rgba(28,28,28,0.14);
+    --text-primary:   var(--woodsmoke-950);
+    --text-secondary: rgba(28,28,28,0.62);
+    --text-tertiary:  rgba(28,28,28,0.44);
+
+    --color-convenio: var(--mandy-500);
+    --color-pasantia: var(--sunset-600);
+
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --radius-pill: 999px;
+
+    --shadow-sm: 0 1px 2px rgba(28,28,28,0.04), 0 2px 6px rgba(28,28,28,0.04);
+    --shadow-md: 0 2px 6px rgba(28,28,28,0.06), 0 8px 24px rgba(28,28,28,0.08);
+    --shadow-lg: 0 8px 28px rgba(28,28,28,0.12);
+
+    --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--bg-page);
+    color: var(--text-primary);
+    font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-weight: 500;
+    font-feature-settings: "ss01", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  body {
+    padding: 32px 24px 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ─── Header ─────────────────────────────────────────── */
+  header.page-head {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto 24px;
+    padding: 0 4px;
+  }
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--mandy-700);
+    margin-bottom: 10px;
+  }
+  h1.title {
+    font-size: clamp(22px, 2.4vw, 30px);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: 1.15;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+  }
+  h1.title em {
+    font-style: normal;
+    color: var(--mandy-600);
+  }
+  .subtitle {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text-secondary);
+    max-width: 720px;
+    line-height: 1.5;
+  }
+
+  /* ─── Map shell ──────────────────────────────────────── */
+  #wrap {
+    position: relative;
+    width: 100%;
+    max-width: 1100px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+  }
+
+  #map { position: relative; background: var(--bg-map-water); }
+  #map svg { width: 100%; display: block; cursor: grab; }
+  #map svg.grabbing { cursor: grabbing; }
+
+  .grat { fill: none; stroke: rgba(28,28,28,0.04); stroke-width: 0.4; }
+  .map-land { fill: var(--bg-map-land); stroke: var(--bg-map-water); stroke-width: 0.6; }
+  .map-sphere { fill: var(--bg-map-water); }
+
+  /* ─── Pin styles ─────────────────────────────────────── */
+  .pin-g {
+    cursor: pointer;
+    transition: opacity 240ms var(--ease), transform 200ms var(--ease);
+    transform-box: fill-box;
+    transform-origin: center bottom;
+  }
+  .pin-g .pb { transition: filter 200ms var(--ease); }
+  .pin-g:hover .pb { filter: drop-shadow(0 4px 6px rgba(28,28,28,0.25)); }
+  .pin-g:hover .pdot { r: 3.6; }
+  .pin-g.dim { opacity: 0; pointer-events: none; transform: scale(0.6); }
+
+  .pin-c .pb { fill: var(--color-convenio); stroke: var(--pure-white); stroke-width: 1.4; }
+  .pin-c .pdot { fill: var(--pure-white); }
+  .pin-p .pb { fill: var(--color-pasantia); stroke: var(--pure-white); stroke-width: 1.4; }
+  .pin-p .pdot { fill: var(--pure-white); }
+
+  /* When an institution has BOTH (convenio + pasantía) we draw it as convenio
+     with a thin sunset ring */
+  .pin-both .pb { fill: var(--color-convenio); stroke: var(--color-pasantia); stroke-width: 2; }
+
+  /* Country cluster halo */
+  .halo {
+    fill: var(--mandy-500);
+    opacity: 0.10;
+    pointer-events: none;
+    transition: opacity 240ms var(--ease);
+  }
+  .halo.dim { opacity: 0; }
+
+  /* ─── Tooltip ────────────────────────────────────────── */
+  #tt {
+    position: absolute;
+    display: none;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    pointer-events: none;
+    z-index: 30;
+    max-width: 260px;
+    min-width: 180px;
+    box-shadow: var(--shadow-lg);
+    font-size: 13px;
+  }
+  #tt .tn {
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.3;
+    margin-bottom: 3px;
+    font-size: 13.5px;
+    letter-spacing: -0.005em;
+  }
+  #tt .tc {
+    color: var(--text-tertiary);
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 9px;
+  }
+  #tt .tgs { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 8px; }
+  .tag {
+    font-size: 10.5px;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: var(--radius-pill);
+    letter-spacing: 0.02em;
+  }
+  .tag-c { background: var(--mandy-100); color: var(--mandy-800); }
+  .tag-p { background: #FFE5E1; color: var(--sunset-700); }
+  #tt .tl {
+    font-size: 12px;
+    color: var(--mandy-600);
+    text-decoration: none;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  #tt .tl:hover { color: var(--mandy-800); }
+
+  /* ─── Top-right zoom controls ────────────────────────── */
+  #zoom-ctrls {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    z-index: 10;
+  }
+  .zb {
+    width: 34px;
+    height: 34px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-sm);
+    transition: background 160ms var(--ease), color 160ms var(--ease), border-color 160ms var(--ease);
+  }
+  .zb:hover { background: var(--mandy-50); color: var(--mandy-700); border-color: var(--mandy-200); }
+  .zb-region {
+    width: 34px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--mandy-600);
+  }
+  #zoom-divider { height: 6px; }
+
+  /* ─── Bottom-left filter / legend bar ────────────────── */
+  .bottom-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 18px;
+    border-top: 1px solid var(--border-soft);
+    background: var(--bg-surface);
+    flex-wrap: wrap;
+  }
+
+  .filter-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .filter-label {
+    font-size: 10.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-tertiary);
+    margin-right: 4px;
+  }
+  .fbtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 13px 7px 10px;
+    background: var(--pure-white);
+    border: 1.5px solid var(--border-medium);
+    border-radius: var(--radius-pill);
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 200ms var(--ease);
+    user-select: none;
+  }
+  .fbtn:hover { border-color: var(--text-primary); color: var(--text-primary); }
+  .fbtn .fdot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+  .fbtn[data-kind="c"] .fdot { background: var(--color-convenio); }
+  .fbtn[data-kind="p"] .fdot { background: var(--color-pasantia); }
+  .fbtn .fcount {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    margin-left: 2px;
+  }
+  .fbtn[aria-pressed="true"] {
+    background: var(--text-primary);
+    border-color: var(--text-primary);
+    color: var(--pure-white);
+  }
+  .fbtn[aria-pressed="true"] .fcount { color: rgba(255,255,255,0.65); }
+  .fbtn[aria-pressed="true"][data-kind="c"] {
+    background: var(--mandy-600); border-color: var(--mandy-600);
+  }
+  .fbtn[aria-pressed="true"][data-kind="p"] {
+    background: var(--sunset-600); border-color: var(--sunset-600);
+  }
+
+  .meta {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+  .meta strong {
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+
+  /* ─── Footer credit ─────────────────────────────────── */
+  footer.page-foot {
+    margin-top: 18px;
+    width: 100%;
+    max-width: 1100px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--text-tertiary);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+  footer.page-foot strong { color: var(--text-secondary); font-weight: 600; }
+
+  /* ─── Hint chip ─────────────────────────────────────── */
+  #hint {
+    position: absolute;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(28,28,28,0.78);
+    color: rgba(255,255,255,0.92);
+    font-size: 11px;
+    font-weight: 500;
+    padding: 5px 12px;
+    border-radius: var(--radius-pill);
+    pointer-events: none;
+    z-index: 12;
+    transition: opacity 1.2s var(--ease);
+    letter-spacing: 0.02em;
+  }
+  #hint.hide { opacity: 0; }
+
+  /* ─── Country list panel (right) ─────────────────────── */
+  .stats-strip {
+    width: 100%;
+    max-width: 1100px;
+    margin: 18px auto 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  .stat {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+  }
+  .stat .lbl {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin-bottom: 6px;
+  }
+  .stat .val {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+  }
+  .stat .val .accent { color: var(--mandy-600); }
+
+  /* ─── Listado desplegable de instituciones ──────────── */
+  .list-section {
+    width: 100%;
+    max-width: 1100px;
+    margin: 28px auto 0;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-lg);
+    padding: 22px 24px 24px;
+  }
+  .list-head { margin-bottom: 18px; }
+  .list-title {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
+  .list-sub {
+    font-size: 12.5px;
+    font-weight: 400;
+    color: var(--text-secondary);
+  }
+  .inst-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 22px 28px;
+  }
+  .country-block { break-inside: avoid; }
+  .country-name {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--mandy-700);
+    border-bottom: 1px solid var(--mandy-100);
+    padding-bottom: 6px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .cn-count {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    background: var(--pearlbush-100);
+    padding: 2px 7px;
+    border-radius: var(--radius-pill);
+    letter-spacing: 0.04em;
+  }
+  .inst-ul { list-style: none; }
+  .inst-li {
+    padding: 6px 0;
+    border-bottom: 1px dashed var(--border-soft);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .inst-li:last-child { border-bottom: none; }
+  .inst-link {
+    color: var(--text-primary);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.35;
+    transition: color 160ms var(--ease);
+  }
+  .inst-link:hover { color: var(--mandy-700); text-decoration: underline; }
+  .inst-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+  .empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 32px;
+    color: var(--text-tertiary);
+    font-size: 13px;
+  }
+
+  @media (max-width: 720px) {
+    body { padding: 18px 12px 32px; }
+    .stats-strip { grid-template-columns: repeat(2, 1fr); }
+    .filter-label { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="page-head">
+  <div class="eyebrow">Doctorado en Ciencias Sociales · UDP</div>
+  <h1 class="title">Mapa de <em>cooperación internacional</em></h1>
+  <p class="subtitle">Convenios institucionales y pasantías de investigación realizadas por estudiantes del Doctorado en Ciencias Sociales en universidades y centros de estudio en el extranjero.</p>
+</header>
+
+<div id="wrap">
+  <div id="map">
+    <div id="zoom-ctrls" role="group" aria-label="Controles de zoom">
+      <button class="zb zb-region" id="btn-eu" title="Centrar en Europa" aria-label="Centrar en Europa">EU</button>
+      <button class="zb zb-region" id="btn-na" title="Centrar en América del Norte" aria-label="Centrar en América del Norte">AN</button>
+      <button class="zb zb-region" id="btn-sa" title="Centrar en América del Sur" aria-label="Centrar en América del Sur">AS</button>
+      <div id="zoom-divider"></div>
+      <button class="zb" id="btn-plus" title="Acercar" aria-label="Acercar">+</button>
+      <button class="zb" id="btn-minus" title="Alejar" aria-label="Alejar">−</button>
+      <button class="zb" id="btn-reset" title="Vista mundial" aria-label="Vista mundial">↺</button>
+    </div>
+    <div id="hint">Scroll para hacer zoom · Arrastra para mover</div>
+  </div>
+
+  <div class="bottom-bar">
+    <div class="filter-group" role="group" aria-label="Filtrar por tipo de cooperación">
+      <span class="filter-label">Mostrar</span>
+      <button class="fbtn" data-kind="c" aria-pressed="true">
+        <span class="fdot"></span><span>Convenios</span><span class="fcount" id="count-c"></span>
+      </button>
+      <button class="fbtn" data-kind="p" aria-pressed="true">
+        <span class="fdot"></span><span>Pasantías</span><span class="fcount" id="count-p"></span>
+      </button>
+    </div>
+    <div class="meta">
+      <strong id="visible-count">—</strong> instituciones visibles
+    </div>
+  </div>
+
+  <div id="tt" role="tooltip" aria-live="polite">
+    <div class="tn" id="tn"></div>
+    <div class="tc" id="tc"></div>
+    <div class="tgs" id="tgs"></div>
+    <a class="tl" id="tl" href="#" target="_blank" rel="noopener noreferrer"></a>
+  </div>
+</div>
+
+<div class="stats-strip">
+  <div class="stat">
+    <div class="lbl">Países</div>
+    <div class="val" id="stat-countries">—</div>
+  </div>
+  <div class="stat">
+    <div class="lbl">Convenios</div>
+    <div class="val"><span class="accent" id="stat-c">—</span></div>
+  </div>
+  <div class="stat">
+    <div class="lbl">Pasantías</div>
+    <div class="val"><span id="stat-p">—</span></div>
+  </div>
+  <div class="stat">
+    <div class="lbl">Total instituciones</div>
+    <div class="val" id="stat-total">—</div>
+  </div>
+</div>
+
+<section class="list-section" aria-label="Listado de instituciones">
+  <div class="list-head">
+    <h2 class="list-title">Listado de instituciones</h2>
+    <p class="list-sub">Filtrá usando los botones del mapa. El listado refleja la selección activa.</p>
+  </div>
+  <div id="inst-list" class="inst-list"></div>
+</section>
+
+<footer class="page-foot">
+  <span>Doctorado en Ciencias Sociales, Universidad Diego Portales.</span>
+  <span>Actualizado <strong>Abril 2026</strong></span>
+</footer>
+
+<script>
+/* ─────────────────────────────────────────────────────────────
+   Loader — fetch d3, topojson, world atlas via standalone-aware
+   __resources map (falls back to live URLs in dev preview).
+   ───────────────────────────────────────────────────────────── */
+(function bootstrap() {
+  const R = (typeof window.__resources === 'object' && window.__resources) || {};
+  const D3_URL       = R.d3lib       || "https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js";
+  const TOPO_URL     = R.topojsonlib || "https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js";
+  const ATLAS_URL    = R.worldatlas  || "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
+
+  function loadScript(src) {
+    return new Promise((res, rej) => {
+      const s = document.createElement('script');
+      s.src = src; s.onload = res; s.onerror = rej;
+      document.head.appendChild(s);
+    });
+  }
+
+  Promise.all([loadScript(D3_URL), loadScript(TOPO_URL)])
+    .then(() => fetch(ATLAS_URL))
+    .then(r => r.json())
+    .then(world => initMap(world))
+    .catch(err => {
+      console.error(err);
+      document.getElementById('map').innerHTML =
+        '<div style="padding:40px;text-align:center;color:var(--text-tertiary);font-size:13px">Error al cargar el mapa.</div>';
+    });
+
+  /* ──────────────────────────────────────────────
+     DATABASE — instituciones por país
+     Format: { n: name, c: country, ll: [lon, lat],
+               u: url, k: kinds [c|p|cp] }
+     k: 'c' = solo convenio, 'p' = solo pasantía,
+        'cp' = convenio + pasantía (institución se cuenta en ambos)
+     ────────────────────────────────────────────── */
+  const DATA = [
+    /* ── Alemania ── */
+    { n: "GIGA – German Institute of Global and Area Studies", c: "Alemania",  ll: [ 9.99, 53.55], u: "https://www.giga-hamburg.de", k: "c"  },
+    { n: "Max Planck Institute for the Study of Societies",    c: "Alemania",  ll: [ 6.96, 50.93], u: "https://www.mpifg.de",        k: "cp" },
+    { n: "Universidad de Hildesheim",                          c: "Alemania",  ll: [ 9.95, 52.15], u: "https://www.uni-hildesheim.de", k: "cp" },
+    { n: "Universidad Libre de Berlín",                        c: "Alemania",  ll: [13.40, 52.50], u: "https://www.fu-berlin.de",   k: "c"  },
+
+    /* ── Argentina ── */
+    { n: "Universidad de San Andrés",                          c: "Argentina", ll: [-58.55, -34.46], u: "https://www.udesa.edu.ar", k: "c"  },
+    { n: "Universidad Nacional de San Martín (UNSAM)",         c: "Argentina", ll: [-58.53, -34.57], u: "https://www.unsam.edu.ar", k: "c"  },
+    { n: "Universidad Torcuato Di Tella (UTDT)",               c: "Argentina", ll: [-58.42, -34.55], u: "https://www.utdt.edu",     k: "c"  },
+
+    /* ── Brasil ── */
+    { n: "Universidade de São Paulo (USP)",                    c: "Brasil",    ll: [-46.73, -23.56], u: "https://www5.usp.br",       k: "c"  },
+    { n: "Universidad de Brasilia (UnB)",                      c: "Brasil",    ll: [-47.93, -15.78], u: "https://www.unb.br",        k: "c"  },
+
+    /* ── Canadá ── */
+    { n: "Universidad de Montreal",                            c: "Canadá",    ll: [-73.62,  45.50], u: "https://www.umontreal.ca",  k: "c"  },
+
+    /* ── Colombia ── */
+    { n: "Universidad del Rosario",                            c: "Colombia",  ll: [-74.07,   4.71], u: "https://www.urosario.edu.co", k: "cp" },
+
+    /* ── Estados Unidos ── */
+    { n: "American University",                                c: "EE. UU.",   ll: [-77.09,  38.94], u: "https://www.american.edu",  k: "c"  },
+
+    /* ── España ── */
+    { n: "Universidad Autónoma de Madrid (UAM)",               c: "España",    ll: [-3.69,  40.55], u: "https://www.uam.es",         k: "c"  },
+    { n: "Universidad Autónoma de Barcelona (UAB)",            c: "España",    ll: [ 2.10,  41.50], u: "https://www.uab.cat",        k: "c"  },
+    { n: "Universidad Complutense de Madrid",                  c: "España",    ll: [-3.72,  40.45], u: "https://www.ucm.es",         k: "c"  },
+    { n: "Universidad de Salamanca",                           c: "España",    ll: [-5.66,  40.96], u: "https://www.usal.es",        k: "c"  },
+    { n: "Universidad Pompeu Fabra",                           c: "España",    ll: [ 2.18,  41.39], u: "https://www.upf.edu",        k: "c"  },
+
+    /* ── Francia ── */
+    { n: "Sciences Po · Lille",                                c: "Francia",   ll: [ 3.06,  50.63], u: "https://www.sciencespo-lille.eu", k: "cp" },
+    { n: "Sciences Po · Paris",                                c: "Francia",   ll: [ 2.33,  48.85], u: "https://www.sciencespo.fr",  k: "cp" },
+    { n: "Université Paris 1 Panthéon-Sorbonne",               c: "Francia",   ll: [ 2.34,  48.85], u: "https://www.pantheonsorbonne.fr", k: "c"  },
+    { n: "Université Paris 10 Nanterre",                       c: "Francia",   ll: [ 2.21,  48.90], u: "https://www.parisnanterre.fr", k: "c"  },
+    { n: "Sorbonne Nouvelle",                                  c: "Francia",   ll: [ 2.36,  48.84], u: "https://www.sorbonne-nouvelle.fr", k: "c"  },
+
+    /* ── México ── */
+    { n: "CIDE – Centro de Investigación y Docencia Económicas", c: "México", ll: [-99.27, 19.36], u: "https://www.cide.edu",       k: "c"  },
+    { n: "Universidad Autónoma Metropolitana (UAM)",           c: "México",    ll: [-99.18,  19.36], u: "https://www.uam.mx",        k: "c"  },
+
+    /* ── Países Bajos ── */
+    { n: "Universidad de Ámsterdam",                           c: "Países Bajos", ll: [ 4.89, 52.36], u: "https://www.uva.nl",         k: "c"  },
+    { n: "Universidad de Leiden",                              c: "Países Bajos", ll: [ 4.50, 52.16], u: "https://www.universiteitleiden.nl", k: "cp" },
+    { n: "VU Amsterdam",                                       c: "Países Bajos", ll: [ 4.86, 52.33], u: "https://vu.nl",              k: "c"  },
+
+    /* ── Perú ── */
+    { n: "Pontificia Universidad Católica del Perú (PUCP)",    c: "Perú",      ll: [-77.08, -12.07], u: "https://www.pucp.edu.pe",    k: "c"  },
+
+    /* ── Uruguay ── */
+    { n: "Universidad Católica del Uruguay",                   c: "Uruguay",   ll: [-56.16, -34.90], u: "https://ucu.edu.uy",         k: "cp" },
+  ];
+
+  function initMap(world) {
+    const W = 1100, H = 540;
+    const mapEl = document.getElementById('map');
+
+    const svg = d3.select('#map').append('svg')
+      .attr('viewBox', `0 0 ${W} ${H}`)
+      .attr('preserveAspectRatio', 'xMidYMid meet');
+
+    const proj = d3.geoNaturalEarth1()
+      .scale(178)
+      .translate([W / 2, H / 2 + 18]);
+    const pathGen = d3.geoPath().projection(proj);
+    const mapG = svg.append('g');
+
+    /* ── Base map layers ───────────────────────────────── */
+    mapG.append('path').datum({ type: 'Sphere' }).attr('class', 'map-sphere').attr('d', pathGen);
+    mapG.append('path').datum(d3.geoGraticule()()).attr('class', 'grat').attr('d', pathGen);
+    mapG.append('g').selectAll('path')
+      .data(topojson.feature(world, world.objects.countries).features)
+      .join('path')
+      .attr('class', 'map-land')
+      .attr('d', pathGen);
+
+    /* ── Country halos (subtle Mandy glow under cluster) ── */
+    const haloLayer = mapG.append('g').attr('class', 'halo-layer');
+    const byCountry = d3.group(DATA, d => d.c);
+    byCountry.forEach((items, country) => {
+      const lon = d3.mean(items, d => d.ll[0]);
+      const lat = d3.mean(items, d => d.ll[1]);
+      const [cx, cy] = proj([lon, lat]);
+      const r = Math.max(14, 8 + Math.sqrt(items.length) * 6);
+      haloLayer.append('circle')
+        .attr('class', 'halo')
+        .attr('cx', cx).attr('cy', cy).attr('r', r)
+        .attr('data-country', country);
+    });
+
+    /* ── Pin geometry ──────────────────────────────────── */
+    const PIN_PATH = "M0,0 C-3.6,-5.2 -7.8,-8.8 -7.8,-14 C-7.8,-19.2 -4.4,-21.8 0,-21.8 C4.4,-21.8 7.8,-19.2 7.8,-14 C7.8,-8.8 3.6,-5.2 0,0Z";
+
+    /* Cluster overlapping pins inside same country to a small ring */
+    function clusterOffsets(items) {
+      if (items.length === 1) return [[0, 0]];
+      const offsets = [];
+      const baseR = 11;
+      const ringR = baseR + Math.max(0, items.length - 6) * 1.2;
+      const step = (Math.PI * 2) / items.length;
+      for (let i = 0; i < items.length; i++) {
+        const a = -Math.PI / 2 + i * step;
+        offsets.push([Math.cos(a) * ringR, Math.sin(a) * ringR - 2]);
+      }
+      return offsets;
+    }
+
+    const pinLayer = mapG.append('g').attr('class', 'pin-layer');
+    const pinNodes = []; // {el, datum}
+
+    byCountry.forEach((items, country) => {
+      const offsets = clusterOffsets(items);
+      items.forEach((d, i) => {
+        const [bx, by] = proj(d.ll);
+        const [ox, oy] = offsets[i];
+        const px = bx + ox, py = by + oy;
+
+        const isC = d.k === 'c' || d.k === 'cp';
+        const isP = d.k === 'p' || d.k === 'cp';
+        const cls = d.k === 'cp' ? 'pin-g pin-both' : (isC ? 'pin-g pin-c' : 'pin-g pin-p');
+
+        const g = pinLayer.append('g')
+          .attr('class', cls)
+          .attr('data-c', isC ? '1' : '0')
+          .attr('data-p', isP ? '1' : '0')
+          .attr('transform', `translate(${px},${py})`);
+
+        g.append('path').attr('class', 'pb').attr('d', PIN_PATH);
+        g.append('circle').attr('class', 'pdot').attr('cy', -14.5).attr('r', 3);
+
+        g.on('mouseenter', (e) => showTooltip(e, d, isC, isP))
+         .on('mouseleave', hideTooltip)
+         .on('click', (e) => {
+            e.stopPropagation();
+            if (d.u) window.open(d.u, '_blank', 'noopener');
+         });
+
+        pinNodes.push({ el: g.node(), c: isC, p: isP });
+      });
+    });
+
+    /* ── Zoom & pan ──────────────────────────────────────
+       NOTE: we deliberately do NOT counter-scale pins on every
+       zoom event — that caused jitter / vibration while panning.
+       Pins grow naturally with the map; this is fluid and stable. */
+    const zoom = d3.zoom().scaleExtent([1, 14]).on('zoom', ev => {
+      mapG.attr('transform', ev.transform);
+      svg.classed('grabbing', ev.transform.k > 1);
+      // Use vector-effect-like compensation on stroke + counter-scale
+      // the pin layer's stroke-width visually via CSS variable.
+      mapG.style('--zk', ev.transform.k);
+    });
+    svg.call(zoom).on('dblclick.zoom', null);
+
+    function zoomTo(ll, k) {
+      const [px, py] = proj(ll);
+      svg.transition().duration(700).call(
+        zoom.transform,
+        d3.zoomIdentity.translate(W / 2 - k * px, H / 2 - k * py).scale(k)
+      );
+    }
+
+    document.getElementById('btn-eu').onclick    = () => zoomTo([10, 50], 4.2);
+    document.getElementById('btn-na').onclick    = () => zoomTo([-95, 38], 3.0);
+    document.getElementById('btn-sa').onclick    = () => zoomTo([-62, -18], 2.8);
+    document.getElementById('btn-plus').onclick  = () => svg.transition().duration(280).call(zoom.scaleBy, 1.5);
+    document.getElementById('btn-minus').onclick = () => svg.transition().duration(280).call(zoom.scaleBy, 0.67);
+    document.getElementById('btn-reset').onclick = () => svg.transition().duration(700).call(zoom.transform, d3.zoomIdentity);
+
+    /* ── Tooltip ───────────────────────────────────────── */
+    const wrap = document.getElementById('wrap');
+    const tt   = document.getElementById('tt');
+
+    function ttPositionFromPin(pinEl) {
+      const r = wrap.getBoundingClientRect();
+      const pr = pinEl.getBoundingClientRect();
+      let x = pr.left - r.left + pr.width / 2 + 14;
+      let y = pr.top  - r.top  - 12;
+      if (x + 280 > r.width)  x = pr.left - r.left - 282;
+      if (y + 160 > r.height) y = pr.top  - r.top  - 162;
+      if (x < 8) x = 8; if (y < 8) y = 8;
+      return [x, y];
+    }
+    function showTooltip(e, d, isC, isP) {
+      document.getElementById('tn').textContent = d.n;
+      document.getElementById('tc').textContent = d.c;
+      document.getElementById('tgs').innerHTML =
+        (isC ? '<span class="tag tag-c">Convenio</span>' : '') +
+        (isP ? '<span class="tag tag-p">Pasantía</span>' : '');
+      const a = document.getElementById('tl');
+      if (d.u) {
+        a.href = d.u;
+        a.textContent = 'Visitar sitio →';
+        a.style.display = 'inline-flex';
+      } else { a.style.display = 'none'; }
+      const [x, y] = ttPositionFromPin(e.currentTarget);
+      tt.style.left = x + 'px';
+      tt.style.top  = y + 'px';
+      tt.style.display = 'block';
+    }
+    function hideTooltip() { tt.style.display = 'none'; }
+
+    /* ── Filter logic ──────────────────────────────────── */
+    const state = { c: true, p: true };
+    const fbtns = document.querySelectorAll('.fbtn');
+
+    function applyFilter() {
+      let visible = 0;
+      pinNodes.forEach(({ el, c, p }) => {
+        const show = (c && state.c) || (p && state.p);
+        el.classList.toggle('dim', !show);
+        if (show) visible++;
+      });
+      // dim halos when no pins of that country are visible
+      haloLayer.selectAll('.halo').each(function() {
+        const country = this.getAttribute('data-country');
+        const anyVisible = pinNodes.some(pn =>
+          DATA[Array.from(pinLayer.node().children).indexOf(pn.el)]?.c === country &&
+          ((pn.c && state.c) || (pn.p && state.p))
+        );
+        this.classList.toggle('dim', !anyVisible);
+      });
+      // simpler halo recompute via DATA grouping
+      haloLayer.selectAll('.halo').each(function() {
+        const country = this.getAttribute('data-country');
+        const items = DATA.filter(d => d.c === country);
+        const anyVisible = items.some(d => {
+          const isC = d.k === 'c' || d.k === 'cp';
+          const isP = d.k === 'p' || d.k === 'cp';
+          return (isC && state.c) || (isP && state.p);
+        });
+        this.classList.toggle('dim', !anyVisible);
+      });
+      document.getElementById('visible-count').textContent = visible;
+    }
+
+    fbtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const k = btn.getAttribute('data-kind');
+        state[k] = !state[k];
+        btn.setAttribute('aria-pressed', state[k] ? 'true' : 'false');
+        applyFilter();
+        renderList();
+      });
+    });
+
+    /* ── Counters & stats ──────────────────────────────── */
+    const cCount = DATA.filter(d => d.k === 'c' || d.k === 'cp').length;
+    const pCount = DATA.filter(d => d.k === 'p' || d.k === 'cp').length;
+    const countries = new Set(DATA.map(d => d.c)).size;
+
+    document.getElementById('count-c').textContent = cCount;
+    document.getElementById('count-p').textContent = pCount;
+    document.getElementById('stat-countries').textContent = countries;
+    document.getElementById('stat-c').textContent = cCount;
+    document.getElementById('stat-p').textContent = pCount;
+    document.getElementById('stat-total').textContent = DATA.length;
+
+    /* ── Listado desplegable por país ───────────────────── */
+    const listEl = document.getElementById('inst-list');
+    function renderList() {
+      const groups = d3.group(
+        DATA.filter(d => {
+          const isC = d.k === 'c' || d.k === 'cp';
+          const isP = d.k === 'p' || d.k === 'cp';
+          return (isC && state.c) || (isP && state.p);
+        }),
+        d => d.c
+      );
+
+      if (groups.size === 0) {
+        listEl.innerHTML = '<div class="empty">Sin instituciones para mostrar. Activá Convenios o Pasantías.</div>';
+        return;
+      }
+
+      const sorted = Array.from(groups.entries()).sort((a, b) => a[0].localeCompare(b[0], 'es'));
+      let html = '';
+      sorted.forEach(([country, items]) => {
+        html += `<div class="country-block"><h3 class="country-name">${country} <span class="cn-count">${items.length}</span></h3><ul class="inst-ul">`;
+        items.forEach(d => {
+          const isC = d.k === 'c' || d.k === 'cp';
+          const isP = d.k === 'p' || d.k === 'cp';
+          const tags =
+            (isC && state.c ? '<span class="tag tag-c">Convenio</span>' : '') +
+            (isP && state.p ? '<span class="tag tag-p">Pasantía</span>' : '');
+          html += `<li class="inst-li"><a href="${d.u}" target="_blank" rel="noopener noreferrer" class="inst-link">${d.n}</a><span class="inst-tags">${tags}</span></li>`;
+        });
+        html += '</ul></div>';
+      });
+      listEl.innerHTML = html;
+    }
+
+    applyFilter();
+    renderList();
+
+    /* ── Hint chip auto-dismiss ────────────────────────── */
+    setTimeout(() => {
+      const h = document.getElementById('hint');
+      if (h) h.classList.add('hide');
+    }, 4200);
+  }
+})();
+</script>
+</body>
+</html>
