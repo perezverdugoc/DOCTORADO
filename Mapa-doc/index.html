@@ -178,8 +178,8 @@
     --sunset-700: #C81C0D;
 
     /* ─── Tokens semánticos ───────────────────────────── */
-    --bg-page:        var(--white);
-    --bg-surface:     var(--pure-white);
+    --bg-page:        #FAF9F5;
+    --bg-surface:     #FFFFFF;
     --bg-map-land:    var(--pearlbush-200);
     --bg-map-water:   var(--pearlbush-50);
     --border-soft:    rgba(28,28,28,0.08);
@@ -189,7 +189,7 @@
     --text-tertiary:  rgba(28,28,28,0.44);
 
     --color-convenio: var(--mandy-500);
-    --color-pasantia: var(--sunset-600);
+    --color-pasantia: #C07B72;
 
     --radius-sm: 6px;
     --radius-md: 10px;
@@ -353,7 +353,7 @@
     letter-spacing: 0.02em;
   }
   .tag-c { background: var(--mandy-100); color: var(--mandy-800); }
-  .tag-p { background: #FFE5E1; color: var(--sunset-700); }
+  .tag-p { background: #F2DDD9; color: #8B5248; }
   #tt .tl {
     font-size: 12px;
     color: var(--mandy-600);
@@ -468,7 +468,7 @@
     background: var(--mandy-600); border-color: var(--mandy-600);
   }
   .fbtn[aria-pressed="true"][data-kind="p"] {
-    background: var(--sunset-600); border-color: var(--sunset-600);
+    background: var(--color-pasantia); border-color: var(--color-pasantia);
   }
 
   .meta {
@@ -480,6 +480,18 @@
   .meta strong {
     color: var(--text-secondary);
     font-weight: 600;
+  }
+
+  /* ─── Bajada intro ──────────────────────────────────── */
+  .bajada-intro {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto 24px;
+    padding: 0 4px;
+    font-size: 20px;
+    font-weight: 300;
+    line-height: 1.5;
+    color: var(--text-secondary);
   }
 
   /* ─── Footer credit ─────────────────────────────────── */
@@ -635,11 +647,7 @@
 </head>
 <body>
 
-<header class="page-head">
-  <div class="eyebrow">Doctorado en Ciencias Sociales · UDP</div>
-  <h1 class="title">Mapa de <em>cooperación internacional</em></h1>
-  <p class="subtitle">Convenios institucionales y pasantías de investigación realizadas por estudiantes del Doctorado en Ciencias Sociales en universidades y centros de estudio en el extranjero.</p>
-</header>
+<p class="bajada-intro">El programa cuenta con una red de convenios con universidades e institutos de investigación en Europa y América Latina. Explora el mapa interactivo para ver las instituciones con acuerdos vigentes y las pasantías realizadas por estudiantes del doctorado.</p>
 
 <div id="wrap">
   <div id="map">
@@ -705,9 +713,6 @@
   <div id="inst-list" class="inst-list"></div>
 </section>
 
-<footer class="page-foot">
-  <span>Doctorado en Ciencias Sociales, Universidad Diego Portales.</span>
-</footer>
 
 <!-- ═══════════════ TWEAKS PANEL ═══════════════ -->
 <div id="tweaks-panel" hidden="">
@@ -862,7 +867,7 @@
   }/*EDITMODE-END*/;
 
   const PALETTES = {
-    mandy:  { c: "#D36473", p: "#ED2615", accent700: "#9C3E4B", accent600: "#BC4F5D", accent100: "#F4D9DD", accent50: "#FBF0F2", accent200: "#EBB8C0", accent800: "#6F2C36" },
+    mandy:  { c: "#D36473", p: "#C07B72", accent700: "#9C3E4B", accent600: "#BC4F5D", accent100: "#F4D9DD", accent50: "#FBF0F2", accent200: "#EBB8C0", accent800: "#6F2C36" },
     bosque: { c: "#3F8F5C", p: "#D97706", accent700: "#1F5C3A", accent600: "#2F7048", accent100: "#D5EBDC", accent50: "#EFF7F1", accent200: "#A8D4B7", accent800: "#16432A" },
     oceano: { c: "#2563B7", p: "#E0492C", accent700: "#1A4A8E", accent600: "#1F58A0", accent100: "#D6E5F5", accent50: "#EDF3FB", accent200: "#A8C4E8", accent800: "#143969" },
     mono:   { c: "#1C1C1C", p: "#C81C0D", accent700: "#1C1C1C", accent600: "#3A3A3A", accent100: "#E4E0D5", accent50: "#F4F4F4", accent200: "#C8C4B8", accent800: "#1C1C1C" }
