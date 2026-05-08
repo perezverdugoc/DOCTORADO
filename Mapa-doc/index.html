@@ -179,7 +179,7 @@
 
     /* ─── Tokens semánticos ───────────────────────────── */
     --bg-page:        #FAF9F5;
-    --bg-surface:     #FFFFFF;
+    --bg-surface:     #FAF9F5;
     --bg-map-land:    var(--pearlbush-200);
     --bg-map-water:   var(--pearlbush-50);
     --border-soft:    rgba(28,28,28,0.08);
@@ -317,7 +317,7 @@
   #tt {
     position: absolute;
     display: none;
-    background: var(--bg-surface);
+    background: #FFFFFF;
     border: 1px solid var(--border-medium);
     border-radius: var(--radius-md);
     padding: 12px 14px;
@@ -482,16 +482,26 @@
     font-weight: 600;
   }
 
+  /* ─── ABC Arizona Flare (bajada) ────────────────────── */
+  @font-face {
+    font-family: 'ABC Arizona Flare';
+    src: url('fonts/ABCArizonaFlare-Light.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+  }
+
   /* ─── Bajada intro ──────────────────────────────────── */
   .bajada-intro {
     width: 100%;
     max-width: 1100px;
     margin: 0 auto 24px;
     padding: 0 4px;
-    font-size: 20px;
+    font-family: 'ABC Arizona Flare', Georgia, serif;
+    font-size: 24px;
     font-weight: 300;
-    line-height: 1.5;
-    color: var(--text-secondary);
+    line-height: 33px;
+    color: #1C1C1C;
   }
 
   /* ─── Footer credit ─────────────────────────────────── */
@@ -1346,20 +1356,4 @@
         });
         html += '</ul></div>';
       });
-      listEl.innerHTML = html;
-    }
-
-    applyFilter();
-    renderList();
-
-    /* ── Hint chip auto-dismiss ────────────────────────── */
-    setTimeout(() => {
-      const h = document.getElementById('hint');
-      if (h) h.classList.add('hide');
-    }, 4200);
-  }
-})();
-</script>
-
-
-</body></html>
+      listEl.inn
